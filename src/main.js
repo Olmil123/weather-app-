@@ -27,17 +27,34 @@ const savedList = document.querySelector("#saved-list");
 
 let state = {
   lang: resolveInitialLang(),
-  theme: localStorage.getItem("theme") || "light",
+  theme: localStorage.getItem("theme") || getAutoTheme(),
   lastData: null,
   lastCity: null,
   lastForecast: null,
+  autoTheme: localStorage.getItem("autoTheme") !== "false",
 };
 
 let isLoading = false;
 
+function getAutoTheme() {
+  const hour = new Date().getHours();
+  return hour >= 6 && hour < 18 ? "light" : "dark";
+}
+
+function updateAutoTheme() {
+  if (!state.autoTheme) return;
+  const autoTheme = getAutoTheme();
+  if (state.theme !== autoTheme) {
+    state.theme = autoTheme;
+    applyTheme(state.theme);
+  }
+}
+
 applyLang(state.lang);
 applyTheme(state.theme);
 renderSaved();
+
+setInterval(updateAutoTheme, 60000);
 
 form?.addEventListener("submit", onSearch);
 themeBtn?.addEventListener("click", toggleTheme);
@@ -113,7 +130,9 @@ function isValidCityName(city) {
 
 function toggleTheme() {
   state.theme = state.theme === "light" ? "dark" : "light";
+  state.autoTheme = false;
   localStorage.setItem("theme", state.theme);
+  localStorage.setItem("autoTheme", "false");
   applyTheme(state.theme);
 }
 
