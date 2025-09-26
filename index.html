@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Modern weather app with real-time data, 5-day forecast, multi-language support, and dark/light themes. Built with vanilla JavaScript and Vite."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="dns-prefetch" href="https://openweathermap.org" />
+    <link rel="preconnect" href="https://openweathermap.org" crossorigin />
+    <title>Weather App</title>
+  </head>
+  <body>
+    <div class="bg-clouds" aria-hidden="true">
+      <span class="cloud"></span>
+      <span class="cloud"></span>
+      <span class="cloud"></span>
+      <span class="cloud"></span>
+      <span class="cloud"></span>
+      <span class="cloud"></span>
+    </div>
+    <div class="app">
+      <header class="app__bar">
+        <h1 class="app__title">Weather App</h1>
+        <div class="controls">
+          <select id="lang-switcher">
+            <option value="en">EN</option>
+            <option value="ua">UA</option>
+            <option value="cs">CZ</option>
+            <option value="ru">RU</option>
+          </select>
+          <button id="theme-toggle" aria-label="Toggle theme">🌙</button>
+        </div>
+      </header>
+
+      <form id="search-form" autocomplete="off" role="search">
+        <input id="city-input" type="text" placeholder="Enter city..." />
+        <button type="submit">Search</button>
+      </form>
+
+      <div class="layout">
+        <aside class="saved">
+          <h3 class="saved__title" data-i18n="savedTitle">Saved cities</h3>
+          <ul id="saved-list" class="saved__list"></ul>
+        </aside>
+
+        <main id="weather-container"></main>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
