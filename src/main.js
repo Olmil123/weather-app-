@@ -54,10 +54,27 @@ applyLang(state.lang);
 applyTheme(state.theme);
 renderSaved();
 
+function initializeThemeToggle() {
+  if (themeBtn) {
+    const switchElement = themeBtn.closest(".switch");
+    if (switchElement) {
+      themeBtn.checked = state.theme === "dark";
+      switchElement.classList.add("initialized");
+    }
+  }
+}
+
+function initializeApp() {
+  initializeThemeToggle();
+  document.body.classList.add("loaded");
+}
+
+document.addEventListener("DOMContentLoaded", initializeApp);
+
 setInterval(updateAutoTheme, 60000);
 
 form?.addEventListener("submit", onSearch);
-themeBtn?.addEventListener("click", toggleTheme);
+themeBtn?.addEventListener("change", toggleTheme);
 langSelect?.addEventListener("change", onLangChange);
 
 async function loadWeatherData(city, lang) {
@@ -129,11 +146,21 @@ function isValidCityName(city) {
 }
 
 function toggleTheme() {
-  state.theme = state.theme === "light" ? "dark" : "light";
+  const newTheme = state.theme === "light" ? "dark" : "light";
+
+  state.theme = newTheme;
   state.autoTheme = false;
   localStorage.setItem("theme", state.theme);
   localStorage.setItem("autoTheme", "false");
+
   applyTheme(state.theme);
+
+  if (themeBtn) {
+    themeBtn.style.transform = "scale(0.95)";
+    setTimeout(() => {
+      themeBtn.style.transform = "scale(1)";
+    }, 150);
+  }
 }
 
 async function onLangChange() {
@@ -182,7 +209,9 @@ function renderFriendlyError(err) {
 
 function applyTheme(theme) {
   document.documentElement.classList.toggle("theme-dark", theme === "dark");
-  if (themeBtn) themeBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+  if (themeBtn) {
+    themeBtn.checked = theme === "dark";
+  }
 }
 
 function applyLang(lang) {
