@@ -137,9 +137,12 @@ export function renderHourly(weatherBox, state, forecast, dayKey) {
 
   const locale = localeMap[state.lang] || "en";
 
+  const now = new Date();
+  const currentTime = now.getTime();
+
   const items = forecast.list.filter((it) => {
-    const k = new Date(it.dt * 1000).toISOString().slice(0, 10);
-    return k === dayKey;
+    const itemTime = it.dt * 1000;
+    return itemTime >= currentTime;
   });
   if (!items.length) return;
 
@@ -162,11 +165,19 @@ export function renderHourly(weatherBox, state, forecast, dayKey) {
     return smoothed;
   };
 
-  for (
-    let ts = new Date(new Date(startTs).setMinutes(0, 0, 0)).getTime();
-    ts <= new Date(new Date(endTs).setMinutes(0, 0, 0)).getTime();
-    ts += 60 * 60 * 1000
-  ) {
+  const currentHour = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours()
+  );
+
+  const startTime = currentHour.getTime();
+
+  const maxHours = 12;
+  const endTime = Math.min(startTime + maxHours * 60 * 60 * 1000, endTs);
+
+  for (let ts = startTime; ts <= endTime; ts += 60 * 60 * 1000) {
     let prev = null,
       next = null;
     for (const it of sorted) {
