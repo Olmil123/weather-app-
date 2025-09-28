@@ -140,15 +140,26 @@ export function renderHourly(weatherBox, state, forecast, dayKey) {
   const now = new Date();
   const currentTime = now.getTime();
 
+  const currentDayKey = new Date(currentTime).toISOString().slice(0, 10);
+
   const items = forecast.list.filter((it) => {
-    const itemTime = it.dt * 1000;
-    return itemTime >= currentTime;
+    const itemDate = new Date(it.dt * 1000).toISOString().slice(0, 10);
+    if (itemDate !== dayKey) return false;
+    if (dayKey === currentDayKey) {
+      return it.dt * 1000 >= currentTime;
+    }
+    return true;
   });
   if (!items.length) return;
 
   const sorted = [...items].sort((a, b) => a.dt - b.dt);
-  const startTs = sorted[0].dt * 1000;
-  const endTs = sorted[sorted.length - 1].dt * 1000;
+
+  const dayStart = new Date(dayKey + "T00:00:00").getTime();
+  const dayEnd = dayStart + 24 * 60 * 60 * 1000 - 1;
+
+  const startTs =
+    dayKey === currentDayKey ? Math.max(dayStart, currentTime) : dayStart;
+  const endTs = dayEnd;
 
   function lerp(a, b, t) {
     return a + (b - a) * t;
@@ -165,17 +176,8 @@ export function renderHourly(weatherBox, state, forecast, dayKey) {
     return smoothed;
   };
 
-  const currentHour = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    now.getHours()
-  );
-
-  const startTime = currentHour.getTime();
-
-  const maxHours = 12;
-  const endTime = Math.min(startTime + maxHours * 60 * 60 * 1000, endTs);
+  const startTime = startTs;
+  const endTime = endTs;
 
   for (let ts = startTime; ts <= endTime; ts += 60 * 60 * 1000) {
     let prev = null,
